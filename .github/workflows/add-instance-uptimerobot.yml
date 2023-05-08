@@ -17,6 +17,7 @@ jobs:
           node-version: 16
       - run: npm install request linkifyjs
       - uses: actions/github-script@v6
+        if: contains(github.event.issue.labels.*.name, 'instance-add')
         with:
           script: |
             var issueInfo = (await github.rest.issues.get({
@@ -27,44 +28,58 @@ jobs:
             var linkify = require("linkifyjs");
             var issueTitleParseUrl = linkify.find(issueInfo.title);
             if (issueTitleParseUrl.length !== 0) {
-              var instanceHostname = (new URL(issueTitleParseUrl[0].href)).hostname;
-              var request = require("request");
-              var options = { method: 'POST',
-                url: 'https://api.uptimerobot.com/v2/newMonitor',
-                json:true,
-                headers:
-                { 'content-type': 'application/x-www-form-urlencoded',
-                  'cache-control': 'no-cache' },
-                form:
-                { api_key: '${{ secrets.UPTIMEROBOT_API_KEY }}',
-                  format: 'json',
-                  type: '1',
-                  url: 'https://' + instanceHostname,
-                  friendly_name: instanceHostname } };
-                        
-              request(options, async function (error, response, body) {
-                if (error) throw new Error(error);
-                if (body.stat == "ok") {
-                  var replyComment = 
-                    ['Hello! Your instance has been added to our monitoring system: https://stats.uptimerobot.com/89VnzSKAn/' + body.monitor.id,
-                    'You need to wait 30 days before we add your instance.',
-                    '',
-                    'Make sure you double checked all the mandatory checks or this will slow down the process of adding your instance!'
-                    ].join('\n');
-                  await github.rest.issues.createComment({
-                    issue_number: context.issue.number,
-                    owner: context.repo.owner,
-                    repo: context.repo.repo,
-                    body: replyComment
-                  })
-                  await github.rest.issues.addLabels({
-                    issue_number: context.issue.number,
-                    owner: context.repo.owner,
-                    repo: context.repo.repo,
-                    labels: ['wait-30-days']
-                  })
-                }
-              });
+              if (issueInfo.title.includes(".onion")) {
+                var replyComment = 
+                  ['Hello! I've detected that you are requesting to add an onion URL.',
+                  'Please create a pull request instead for adding your onion url as an alternative: https://github.com/iv-org/documentation/edit/master/docs/instances.md',
+                  ].join('\n');
+                await github.rest.issues.createComment({
+                  issue_number: context.issue.number,
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  body: replyComment
+                })
+              }
+              else {
+                var instanceHostname = (new URL(issueTitleParseUrl[0].href)).hostname;
+                var request = require("request");
+                var options = { method: 'POST',
+                  url: 'https://api.uptimerobot.com/v2/newMonitor',
+                  json:true,
+                  headers:
+                  { 'content-type': 'application/x-www-form-urlencoded',
+                    'cache-control': 'no-cache' },
+                  form:
+                  { api_key: '${{ secrets.UPTIMEROBOT_API_KEY }}',
+                    format: 'json',
+                    type: '1',
+                    url: 'https://' + instanceHostname,
+                    friendly_name: instanceHostname } };
+                          
+                request(options, async function (error, response, body) {
+                  if (error) throw new Error(error);
+                  if (body.stat == "ok") {
+                    var replyComment = 
+                      ['Hello! Your instance has been added to our monitoring system: https://stats.uptimerobot.com/89VnzSKAn/' + body.monitor.id,
+                      'You need to wait 30 days before we add your instance.',
+                      '',
+                      'Make sure you double checked all the mandatory checks or this will slow down the process of adding your instance!'
+                      ].join('\n');
+                    await github.rest.issues.createComment({
+                      issue_number: context.issue.number,
+                      owner: context.repo.owner,
+                      repo: context.repo.repo,
+                      body: replyComment
+                    })
+                    await github.rest.issues.addLabels({
+                      issue_number: context.issue.number,
+                      owner: context.repo.owner,
+                      repo: context.repo.repo,
+                      labels: ['wait-30-days']
+                    })
+                  }
+                });
+              }
             }
             else {
               var replyComment = 

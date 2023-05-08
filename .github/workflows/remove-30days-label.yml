@@ -1,4 +1,4 @@
-name: Remove 30 days label
+name: Remove instance label when closing
 
 on:
   issues:
@@ -12,6 +12,7 @@ jobs:
     permissions: write-all
     steps:
       - uses: actions/github-script@v6
+        if: contains(github.event.issue.labels.*.name, 'wait-30-days')
         with:
           script: |
             await github.rest.issues.removeLabel({
@@ -19,4 +20,4 @@ jobs:
               owner: context.repo.owner,
               repo: context.repo.repo,
               name: 'wait-30-days'
-            })
+            });
