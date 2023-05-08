@@ -42,7 +42,7 @@ jobs:
                   url: 'https://' + instanceHostname,
                   friendly_name: instanceHostname } };
                         
-              request(options, function (error, response, body) {
+              request(options, async function (error, response, body) {
                 if (error) throw new Error(error);
 
                 if (body.stat === "ok") {
