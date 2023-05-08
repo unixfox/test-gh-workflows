@@ -19,9 +19,10 @@ jobs:
       - uses: actions/github-script@v6
         with:
           script: |
+            console.log(context.issue.title)
             var linkify = require("linkifyjs");
             var issueTitleParseUrl = linkify.find(context.issue.title);
-            if (issueTitleParseUrl[0]) {
+            if (issueTitleParseUrl.length !== 0) {
               var instanceHostname = (new URL(issueTitleParseUrl[0].href)).hostname;
               console.log(instanceHostname)
               var request = require("request");
