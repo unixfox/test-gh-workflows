@@ -15,28 +15,48 @@ jobs:
       - uses: actions/setup-node@v3
         with:
           node-version: 16
-      - run: npm install request
+      - run: npm install request linkifyjs
       - uses: actions/github-script@v6
-        id: my-script
         with:
           script: |
-            var request = require("request");
-            var options = { method: 'POST',
-              url: 'https://api.uptimerobot.com/v2/newMonitor',
-              headers:
-              { 'content-type': 'application/x-www-form-urlencoded',
-                'cache-control': 'no-cache' },
-              form:
-              { api_key: '${{ secrets.UPTIMEROBOT_API_KEY }}',
-                format: 'json',
-                type: '1',
-                url: 'http://myMonitorURL.com',
-                friendly_name: 'My Monitor' } };
-                      
-            request(options, function (error, response, body) {
-              if (error) throw new Error(error);
-                      
-              console.log(body);
-            });
+            const issueTitleParseUrl = linkify.find(context.issue.title);
+            if (issueTitleParseUrl[0]) {
+              const instanceHostname = 
+              let request = require("request");
+              let options = { method: 'POST',
+                url: 'https://api.uptimerobot.com/v2/newMonitor',
+                headers:
+                { 'content-type': 'application/x-www-form-urlencoded',
+                  'cache-control': 'no-cache' },
+                form:
+                { api_key: '${{ secrets.UPTIMEROBOT_API_KEY }}',
+                  format: 'json',
+                  type: '1',
+                  url: 'http://myMonitorURL.com',
+                  friendly_name: 'My Monitor' } };
+                        
+              request(options, function (error, response, body) {
+                if (error) throw new Error(error);
+                        
+                console.log(body);
+              });
 
-            console.log(context);
+              console.log(context);
+            }
+            else {
+              github.rest.issues.createComment({
+                issue_number: context.issue.number,
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                body: `Domain not detected in the title, please edit the title by correcting it like this and reopen the issue:
+
+                Issue title example: [New instance] https://myinstance.com
+                `
+              });
+              github.rest.issues.update({
+                issue_number: context.issue.number,
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                state: 'closed'
+              });
+            }
