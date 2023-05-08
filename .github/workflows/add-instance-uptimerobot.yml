@@ -38,3 +38,5 @@ jobs:
                       
               console.log(body);
             });
+
+            console.log(context);
