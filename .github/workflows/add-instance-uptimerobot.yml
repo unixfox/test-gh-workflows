@@ -2,7 +2,7 @@ name: Add instance to uptimerobot
 
 on:
   issues:
-    types: [opened]
+    types: [opened, reopened]
 
 jobs:
 
