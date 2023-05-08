@@ -25,7 +25,6 @@ jobs:
               repo: context.repo.repo,
             })).data;
             var linkify = require("linkifyjs");
-            console.log()
             var issueTitleParseUrl = linkify.find(issueInfo.title);
             if (issueTitleParseUrl.length !== 0) {
               var instanceHostname = (new URL(issueTitleParseUrl[0].href)).hostname;
@@ -40,11 +39,29 @@ jobs:
                 { api_key: '${{ secrets.UPTIMEROBOT_API_KEY }}',
                   format: 'json',
                   type: '1',
-                  url: 'http://myMonitorURL.com',
-                  friendly_name: 'My Monitor' } };
+                  url: 'https://' + instanceHostname,
+                  friendly_name: instanceHostname } };
                         
               request(options, function (error, response, body) {
                 if (error) throw new Error(error);
+
+                if (body.stat === "ok") {
+                  var replyComment = 
+                    ['Instance added to Uptime Robot: https://stats.uptimerobot.com/89VnzSKAn/' + body.monitor.id,
+                    ].join('\n');
+                  await github.rest.issues.createComment({
+                    issue_number: context.issue.number,
+                    owner: context.repo.owner,
+                    repo: context.repo.repo,
+                    body: replyComment
+                  })
+                  await github.rest.issues.addLabels({
+                    issue_number: context.issue.number,
+                    owner: context.repo.owner,
+                    repo: context.repo.repo,
+                    labels: ['wait-30-days']
+                  })
+                }
                         
                 console.log(body);
               });
@@ -52,10 +69,10 @@ jobs:
               console.log(context);
             }
             else {
-            var replyComment = 
-              ['Domain not detected in the title, please edit the title by correcting it like this and reopen the issue:',
-                'Issue title example: `[New instance] https://myinstance.com`'
-              ].join('\n');
+              var replyComment = 
+                ['Domain not detected in the title, please edit the title by correcting it like this and reopen the issue:',
+                  'Issue title example: `[New instance] https://myinstance.com`'
+                ].join('\n');
 
               await github.rest.issues.createComment({
                 issue_number: context.issue.number,
