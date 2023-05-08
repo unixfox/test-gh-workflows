@@ -1,0 +1,22 @@
+name: Remove 30 days label
+
+on:
+  issues:
+    types: [closed]
+
+jobs:
+
+  replycomment:
+
+    runs-on: ubuntu-latest
+    permissions: write-all
+    steps:
+      - uses: actions/github-script@v6
+        with:
+          script: |
+            await github.rest.issues.removeLabels({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              labels: ['wait-30-days']
+            })
