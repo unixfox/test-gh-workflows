@@ -52,12 +52,16 @@ jobs:
               console.log(context);
             }
             else {
+            var replyComment = 
+              ['Domain not detected in the title, please edit the title by correcting it like this and reopen the issue:',
+                'Issue title example: `[New instance] https://myinstance.com`'
+              ].join('\n');
+
               await github.rest.issues.createComment({
                 issue_number: context.issue.number,
                 owner: context.repo.owner,
                 repo: context.repo.repo,
-                body: `Domain not detected in the title, please edit the title by correcting it like this and reopen the issue:
-                Issue title example: `[New instance] https://myinstance.com``
+                body: replyComment
               })
               await github.rest.issues.update({
                 issue_number: context.issue.number,
