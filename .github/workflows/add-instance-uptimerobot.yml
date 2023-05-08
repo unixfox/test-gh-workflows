@@ -19,14 +19,14 @@ jobs:
       - uses: actions/github-script@v6
         with:
           script: |
-            console.log(context.issue)
-            var linkify = require("linkifyjs");
-            console.log(await github.rest.issues.get({
+            var issueInfo = (await github.rest.issues.get({
               issue_number: context.issue.number,
               owner: context.repo.owner,
               repo: context.repo.repo,
-            }))
-            var issueTitleParseUrl = linkify.find(context.issue.title);
+            })).data;
+            var linkify = require("linkifyjs");
+            console.log()
+            var issueTitleParseUrl = linkify.find(issueInfo.title);
             if (issueTitleParseUrl.length !== 0) {
               var instanceHostname = (new URL(issueTitleParseUrl[0].href)).hostname;
               console.log(instanceHostname)
