@@ -30,7 +30,7 @@ jobs:
             if (issueTitleParseUrl.length !== 0) {
               if (issueInfo.title.includes(".onion")) {
                 var replyComment = 
-                  ['Hello! I've detected that you are requesting to add an onion URL.',
+                  ['Hello! I\'ve detected that you are requesting to add an onion URL.',
                   'Please create a pull request instead for adding your onion url as an alternative to your clearnet URL: https://github.com/iv-org/documentation/edit/master/docs/instances.md'
                   ].join('\n');
                 await github.rest.issues.createComment({
