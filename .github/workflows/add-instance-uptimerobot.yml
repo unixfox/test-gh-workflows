@@ -32,6 +32,7 @@ jobs:
               var request = require("request");
               var options = { method: 'POST',
                 url: 'https://api.uptimerobot.com/v2/newMonitor',
+                json:true
                 headers:
                 { 'content-type': 'application/x-www-form-urlencoded',
                   'cache-control': 'no-cache' },
@@ -44,8 +45,8 @@ jobs:
                         
               request(options, async function (error, response, body) {
                 if (error) throw new Error(error);
-
-                if (body.stat === "ok") {
+                console.log(body.stat)
+                if (body.stat == "ok") {
                   var replyComment = 
                     ['Instance added to Uptime Robot: https://stats.uptimerobot.com/89VnzSKAn/' + body.monitor.id,
                     ].join('\n');
