@@ -48,7 +48,10 @@ jobs:
                 console.log(body.stat)
                 if (body.stat == "ok") {
                   var replyComment = 
-                    ['Instance added to Uptime Robot: https://stats.uptimerobot.com/89VnzSKAn/' + body.monitor.id,
+                    ['Hello! Your instance has been added to our monitoring system: https://stats.uptimerobot.com/89VnzSKAn/' + body.monitor.id
+                    'You need to wait 30 days before we add your instance.'
+                    ''
+                    'Make sure you double checked all the mandatory checks or this will slow down the process of adding your instance!'
                     ].join('\n');
                   await github.rest.issues.createComment({
                     issue_number: context.issue.number,
