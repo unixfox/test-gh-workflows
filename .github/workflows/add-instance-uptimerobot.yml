@@ -21,6 +21,11 @@ jobs:
           script: |
             console.log(context.issue)
             var linkify = require("linkifyjs");
+            console.log(github.rest.issues.get({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+            }))
             var issueTitleParseUrl = linkify.find(context.issue.title);
             if (issueTitleParseUrl.length !== 0) {
               var instanceHostname = (new URL(issueTitleParseUrl[0].href)).hostname;
