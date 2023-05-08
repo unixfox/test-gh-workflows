@@ -21,7 +21,7 @@ jobs:
           script: |
             console.log(context.issue)
             var linkify = require("linkifyjs");
-            console.log(github.rest.issues.get({
+            console.log(await github.rest.issues.get({
               issue_number: context.issue.number,
               owner: context.repo.owner,
               repo: context.repo.repo,
@@ -52,7 +52,7 @@ jobs:
               console.log(context);
             }
             else {
-              github.rest.issues.createComment({
+              await github.rest.issues.createComment({
                 issue_number: context.issue.number,
                 owner: context.repo.owner,
                 repo: context.repo.repo,
@@ -61,7 +61,7 @@ jobs:
                 Issue title example: [New instance] https://myinstance.com
                 `
               })
-              github.rest.issues.update({
+              await github.rest.issues.update({
                 issue_number: context.issue.number,
                 owner: context.repo.owner,
                 repo: context.repo.repo,
