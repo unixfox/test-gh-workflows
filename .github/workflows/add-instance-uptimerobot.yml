@@ -28,7 +28,6 @@ jobs:
             var issueTitleParseUrl = linkify.find(issueInfo.title);
             if (issueTitleParseUrl.length !== 0) {
               var instanceHostname = (new URL(issueTitleParseUrl[0].href)).hostname;
-              console.log(instanceHostname)
               var request = require("request");
               var options = { method: 'POST',
                 url: 'https://api.uptimerobot.com/v2/newMonitor',
@@ -45,7 +44,6 @@ jobs:
                         
               request(options, async function (error, response, body) {
                 if (error) throw new Error(error);
-                console.log(body.stat)
                 if (body.stat == "ok") {
                   var replyComment = 
                     ['Hello! Your instance has been added to our monitoring system: https://stats.uptimerobot.com/89VnzSKAn/' + body.monitor.id,
@@ -66,11 +64,7 @@ jobs:
                     labels: ['wait-30-days']
                   })
                 }
-                        
-                console.log(body);
               });
-
-              console.log(context);
             }
             else {
               var replyComment = 
